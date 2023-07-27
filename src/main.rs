@@ -1,12 +1,15 @@
+mod ui;
+
 use std::io;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 
+
 pub struct Data{
     pub name: String,
-    pub quiz1: u32,
-    pub quiz2: u32,
-    pub quiz3: u32,
+    pub quiz1: u64,
+    pub quiz2: u64,
+    pub quiz3: u64,
 }
 
 pub struct Node{
@@ -47,9 +50,8 @@ impl LinkedList {
         let mut p = &self.head;
 
         while let Some(node) = p {
-            let fp_str = format!("{} {} {} {:}\n", node.data.name, node.data.quiz1,
-                                 node.data.quiz2, node.data.quiz3);
-            fp.write_all(fp_str.as_bytes())?;
+            let name_str = format!("{}\t{}\t{}\t{}\n", node.data.name.trim_end(), node.data.quiz1, node.data.quiz2, node.data.quiz3);
+            fp.write_all(name_str.as_bytes())?;
             p = &node.next;
         }
         Ok(())
@@ -65,9 +67,9 @@ impl LinkedList {
 
             if parts.len() >= 4 {
                 let n = parts[0..parts.len() - 3].join(" ");
-                let q1: u32 = parts[parts.len() - 3].parse().unwrap_or_default();
-                let q2: u32 = parts[parts.len() - 2].parse().unwrap_or_default();
-                let q3: u32 = parts[parts.len() - 1].parse().unwrap_or_default();
+                let q1: u64 = parts[parts.len() - 3].parse().unwrap_or_default();
+                let q2: u64 = parts[parts.len() - 2].parse().unwrap_or_default();
+                let q3: u64 = parts[parts.len() - 1].parse().unwrap_or_default();
 
                 let data = Data {
                     name: n,
@@ -82,12 +84,11 @@ impl LinkedList {
         Ok(())
     }
 
-
     fn display(&self)  {
         let mut p = &self.head;
 
         while let Some(node) = p.as_ref() {
-            println!("{} {} {} {}", node.data.name, node.data.quiz1, node.data.quiz2, node.data.quiz3);
+            println!("{}\t{}\t{}\t{}", node.data.name.trim_end(), node.data.quiz1, node.data.quiz2, node.data.quiz3);
             io::stdout().flush().unwrap();
             p = &node.next;
         }
@@ -106,17 +107,17 @@ fn new_rec() -> Data{
     out.flush().unwrap();
     let mut n_quiz1 = String::new();
     scan.read_line(&mut n_quiz1).expect("Invalid input");
-    let n_quiz1: u32 = n_quiz1.trim().parse().expect("Invalid score");
+    let n_quiz1: u64 = n_quiz1.trim().parse().expect("Invalid score");
     print!("Quiz 2: ");
     out.flush().unwrap();
     let mut n_quiz2 = String::new();
     scan.read_line(&mut n_quiz2).expect("Invalid input");
-    let n_quiz2: u32 = n_quiz2.trim().parse().expect("Invalid score");
+    let n_quiz2: u64 = n_quiz2.trim().parse().expect("Invalid score");
     print!("Quiz 3: ");
     out.flush().unwrap();
     let mut n_quiz3 = String::new();
     scan.read_line(&mut n_quiz3).expect("Invalid input");
-    let n_quiz3: u32 = n_quiz3.trim().parse().expect("Invalid score");
+    let n_quiz3: u64 = n_quiz3.trim().parse().expect("Invalid score");
 
     let new_data = Data {
         name: n_name,
@@ -132,14 +133,15 @@ fn main() {
     let scan = io::stdin();
     let mut out = io::stdout();
     list.read_file().expect("File does not exist");
+    ui::main_ui();
     loop {
         println!("Student Record");
         print!("1. Add new record\n2. View record\n3. Exit\nChoice: ");
         out.flush().unwrap();
         let mut choice = String::new();
         scan.read_line(&mut choice).expect("Invalid input");
-        let choice: u32 = choice.trim().parse().expect("Choose from 1-3 only!");
-        match choice{
+        let choice: u64 = choice.trim().parse().expect("Choose from 1-3 only!");
+        match choice {
             1 => {
                 let new_data: Data = new_rec();
                 list.add_rec(new_data);
@@ -151,7 +153,9 @@ fn main() {
             3 => {
                 std::process::exit(0);
             }
-            _ => {}
+            _ => {
+                println!("Error!");
+            }
         }
     }
 
