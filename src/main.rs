@@ -128,7 +128,7 @@ fn new_rec() -> Data{
     return new_data;
 }
 
-fn main() {
+pub(crate) fn main() {
     let mut list = LinkedList::new();
     let scan = io::stdin();
     let mut out = io::stdout();
